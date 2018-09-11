@@ -1,0 +1,10 @@
+version: '3'
+services:
+
+  activemq:
+    image: webcenter/activemq
+    ports:
+      - "61616:61616"
+    volumes:
+      - ./activemq_data:/data
+
