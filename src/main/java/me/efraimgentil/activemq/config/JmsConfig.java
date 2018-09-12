@@ -1,6 +1,7 @@
 package me.efraimgentil.activemq.config;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jca.cci.connection.CciLocalTransactionManager;
@@ -11,6 +12,8 @@ import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.jms.Session;
 
 @Configuration
 @EnableTransactionManagement
@@ -23,27 +26,36 @@ public class JmsConfig {
     }
 
     @Bean
-    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(ActiveMQConnectionFactory activeMQConnectionFactory, PlatformTransactionManager platformTransactionManager) {
+    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(CachingConnectionFactory ccf, PlatformTransactionManager platformTransactionManager) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        factory.setConnectionFactory(activeMQConnectionFactory);
+        factory.setConnectionFactory(ccf);
         factory.setTransactionManager(platformTransactionManager);
+        factory.setSessionTransacted(true);
+        factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
         factory.setConcurrency("3-10");
         return factory;
     }
 
     @Bean
     public CachingConnectionFactory cachingConnectionFactory() {
-        return new CachingConnectionFactory(activeMQConnectionFactory());
+        CachingConnectionFactory ccf = new CachingConnectionFactory(activeMQConnectionFactory());
+        return ccf;
     }
 
     @Bean
-    public JmsTemplate jmsTemplate() {
-        return new JmsTemplate(cachingConnectionFactory());
+    public JmsTemplate jmsTemplate(CachingConnectionFactory ccf) {
+        JmsTemplate jmsTemplate = new JmsTemplate(ccf);
+        jmsTemplate.setSessionTransacted(true);
+        return jmsTemplate;
     }
 
     @Bean
-    public PlatformTransactionManager platformTransactionManager(ActiveMQConnectionFactory activeMQConnectionFactory){
-        return new JmsTransactionManager(activeMQConnectionFactory);
+    public PlatformTransactionManager platformTransactionManager(CachingConnectionFactory ccf){
+        return new JmsTransactionManager(ccf);
+    }
+
+    public void t(){
+        GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition();
     }
 
 }

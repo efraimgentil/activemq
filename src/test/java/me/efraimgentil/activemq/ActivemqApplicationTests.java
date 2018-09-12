@@ -21,4 +21,12 @@ public class ActivemqApplicationTests {
 		sender.convertAndSend("testQueue" , "Test message");
 	}
 
+	@Test
+	public void contextLoads2() {
+		sender.setDeliveryPersistent(true);
+		//sender.
+		sender.convertAndSend("testQueue2" , "Test message");
+	}
+
+
 }
