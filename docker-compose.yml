@@ -2,9 +2,11 @@ version: '3'
 services:
 
   activemq:
-    image: webcenter/activemq
+    image: rmohr/activemq:5.14.0-alpine
     ports:
       - "61616:61616"
+      - "8161:8161"
     volumes:
       - ./activemq_data:/data
+      - ./activemq.xml:/opt/activemq/conf/activemq.xml
 

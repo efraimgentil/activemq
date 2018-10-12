@@ -28,6 +28,8 @@ public class EventListener {
         System.out.println(String.format("%s : %s" , "isRedelivery" , message.getJMSRedelivered()));
         System.out.println(String.format("%s : %s" , "deliveryCount" , message.getIntProperty("JMSXDeliveryCount")));
 
+        if("error".equals(messageString))
+            throw new RuntimeException("Should never deliver");
 
         if(!messages.containsKey(messageString)){
             messages.put(messageString , 1);
